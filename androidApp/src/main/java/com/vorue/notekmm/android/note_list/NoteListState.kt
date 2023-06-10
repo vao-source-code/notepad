@@ -2,9 +2,9 @@ package com.vorue.notekmm.android.note_list
 
 import com.vorue.notekmm.domain.Note
 
-data class NoteListState (
+data class NoteListState(
     val notes: List<Note> = emptyList(),
-    val searchText : String = "",
-    val isSearchActive : Boolean = false,
+    val searchText: String = "",
+    val isSearchActive: Boolean = false,
 
     )
