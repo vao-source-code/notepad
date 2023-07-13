@@ -18,26 +18,27 @@ class NoteDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val noteTitle = savedStateHandle.getStateFlow("noteTitle", "")
-    private val isNoteTitleTextFocused =
-        savedStateHandle.getStateFlow("isNoteTitleTextFocused", false)
+    private val isNoteTitleFocused = savedStateHandle.getStateFlow("isNoteTitleFocused", false)
     private val noteContent = savedStateHandle.getStateFlow("noteContent", "")
-    private val isNoteContentTextFocused =
-        savedStateHandle.getStateFlow("isNoteContentTextFocused", false)
-    private val noteColor = savedStateHandle.getStateFlow("noteColor", Note.generateRandomColor())
+    private val isNoteContentFocused = savedStateHandle.getStateFlow("isNoteContentFocused", false)
+    private val noteColor = savedStateHandle.getStateFlow(
+        "noteColor",
+        Note.generateRandomColor()
+    )
 
     val state = combine(
         noteTitle,
-        isNoteTitleTextFocused,
+        isNoteTitleFocused,
         noteContent,
-        isNoteContentTextFocused,
+        isNoteContentFocused,
         noteColor
-    ) { noteTitle, isNoteTitleTextFocused, noteContent, isNoteContentTextFocused, noteColor ->
+    ) { title, isTitleFocused, content, isContentFocused, color ->
         NoteDetailState(
-            noteTitle = noteTitle,
-            isNoteTitleHintVisible = noteTitle.isEmpty() &&  !isNoteTitleTextFocused,
-            noteContent = noteContent,
-            isNoteContentHintVisible = noteContent.isEmpty() && !isNoteContentTextFocused,
-            noteColor = noteColor
+            noteTitle = title,
+            isNoteTitleHintVisible = title.isEmpty() && !isTitleFocused,
+            noteContent = content,
+            isNoteContentHintVisible = content.isEmpty() && !isContentFocused,
+            noteColor = color
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), NoteDetailState())
 
@@ -46,12 +47,10 @@ class NoteDetailViewModel @Inject constructor(
 
     private var existingNoteId: Long? = null
 
-
     init {
         savedStateHandle.get<Long>("noteId")?.let { existingNoteId ->
-
-            if (existingNoteId != -1L) {
-                return@let //Si no es -1L, no hago nada deberia abrir la nota
+            if (existingNoteId == -1L) {
+                return@let
             }
             this.existingNoteId = existingNoteId
             viewModelScope.launch {
@@ -62,26 +61,29 @@ class NoteDetailViewModel @Inject constructor(
                 }
             }
         }
-
     }
 
-    fun onNoteTitleChanged(noteTitle: String) {
-        savedStateHandle["noteTitle"] = noteTitle
+    fun onNoteTitleChanged(text: String) {
+        savedStateHandle["noteTitle"] = text
+    }
+
+    fun onNoteContentChanged(text: String) {
+        savedStateHandle["noteContent"] = text
+    }
+
+    fun onNoteColorChanged(color: Long) {
+        savedStateHandle["noteColor"] = color
     }
 
     fun onNoteTitleFocusChanged(isFocused: Boolean) {
         savedStateHandle["isNoteTitleFocused"] = isFocused
     }
 
-    fun onNoteContentChanged(noteContent: String) {
-        savedStateHandle["noteContent"] = noteContent
-    }
-
     fun onNoteContentFocusChanged(isFocused: Boolean) {
         savedStateHandle["isNoteContentFocused"] = isFocused
     }
 
-    fun saveNote(){
+    fun saveNote() {
         viewModelScope.launch {
             noteDataSource.insertNote(
                 Note(
@@ -95,7 +97,4 @@ class NoteDetailViewModel @Inject constructor(
             _hasNoteBeenSaved.value = true
         }
     }
-
-
-
 }

@@ -11,8 +11,24 @@ data class Note(
     val created: LocalDateTime
 ){
     companion object {
-        private val colors = listOf(COLOR_BLUE, COLOR_GREEN, COLOR_ORANGE , COLOR_PINK , COLOR_RED)
+        val colors = listOf(   COLOR_BLUE,
+            COLOR_GREEN,
+            COLOR_PINK,
+            COLOR_PURPLE,
+            COLOR_RED,
+            COLOR_ORANGE,
+            COLOR_YELLOW)
 
+        val nameColor = listOf("COLOR_BLUE",
+            "COLOR_GREEN",
+            "COLOR_PINK",
+            "COLOR_PURPLE",
+            "COLOR_RED",
+            "COLOR_ORANGE",
+            "COLOR_YELLOW")
         fun generateRandomColor()  = colors.random()
+        fun nameColor( id : Int ): String{
+            return nameColor[id]
+        }
     }
 }

@@ -6,6 +6,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -25,6 +28,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.vorue.notekmm.android.note_list.HideableSearchTextField
 import com.vorue.notekmm.android.note_list.NoteItem
+import com.vorue.notekmm.domain.Note
+import com.vorue.notekmm.presentation.COLOR_BLUE
+import com.vorue.notekmm.presentation.COLOR_GREEN
+import com.vorue.notekmm.presentation.COLOR_ORANGE
+import com.vorue.notekmm.presentation.COLOR_PINK
+import com.vorue.notekmm.presentation.COLOR_PURPLE
+import com.vorue.notekmm.presentation.COLOR_RED
+import com.vorue.notekmm.presentation.COLOR_YELLOW
 
 
 @Composable
@@ -101,6 +112,12 @@ fun NoteDetailsScreenBody(state: NoteDetailState, modifier: Modifier, paddingVal
             textStyle = TextStyle(fontSize = 20.sp),
             modifier = Modifier.weight(1f)
         )
+
+
+        Row() {
+            LazyVerticalColorButton(modifier, viewModel)
+        }
+
     }
 
 }
@@ -114,4 +131,27 @@ fun PreviewNoteDetailsScreen() {
         paddingValues = PaddingValues(),
         viewModel = hiltViewModel()
     )
+}
+
+
+@Preview
+@Composable
+fun PreviewNoteDetailsScreenDark() {
+    val listColor = listOf(
+        COLOR_BLUE,
+        COLOR_GREEN,
+        COLOR_PINK,
+        COLOR_PURPLE,
+        COLOR_RED,
+        COLOR_ORANGE,
+        COLOR_YELLOW
+    )
+    LazyVerticalGrid(modifier = Modifier.width(210.dp), columns = GridCells.Fixed(7) , content = {
+        items(listColor) { it ->
+            val i = listColor.indexOf(it)
+            Button(modifier = Modifier.height(40.dp).width(30.dp).padding(5.dp), onClick = {  } , colors = ButtonDefaults.buttonColors(backgroundColor = Color(it)) ) {
+               // Text(text = Note.nameColor(i))
+            }
+        }
+    })
 }

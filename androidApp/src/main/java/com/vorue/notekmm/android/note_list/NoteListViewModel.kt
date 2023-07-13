@@ -37,7 +37,7 @@ class NoteListViewModel @Inject constructor(
 
 
     //Lo creo para pruebas de la app
-    init {
+    /*init {
         viewModelScope.launch {
             (1..10).forEach {
                 noteDataSource.insertNote(
@@ -51,7 +51,8 @@ class NoteListViewModel @Inject constructor(
                 )
             }
         }
-    }
+    }*/
+
     fun loadNotes() {
         viewModelScope.launch {
             savedStateHandle["notes"] = noteDataSource.getAllNotes()
