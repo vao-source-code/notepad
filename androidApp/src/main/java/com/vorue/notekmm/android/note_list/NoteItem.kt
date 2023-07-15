@@ -77,7 +77,9 @@ fun NoteItemPreview() {
             title = "Title",
             content = "Content",
             colorHex = COLOR_PINK,
-            created = DateTimeUtil.now()
+            created = DateTimeUtil.now(),
+            start = DateTimeUtil.now(),
+            end = DateTimeUtil.now()
         ),
         backgroundColor = Color.White,
         onNoteClick = {},

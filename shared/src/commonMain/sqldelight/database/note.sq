@@ -3,8 +3,11 @@ CREATE TABLE noteEntity(
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     colorHex INTEGER NOT NULL,
-    created INTEGER NOT NULL
+    created INTEGER NOT NULL,
+    start INTEGER ,
+    end INTEGER NOT NULL
 );
+
 
 getAllNotes:
 SELECT * FROM noteEntity ORDER BY created DESC;
@@ -14,10 +17,10 @@ SELECT * FROM noteEntity WHERE id = ?;
 
 insertNote:
 INSERT OR REPLACE
-INTO noteEntity (id , title, content, colorHex, created) VALUES (?, ?, ?, ?, ?);
+INTO noteEntity (id , title, content, colorHex, created, start,end) VALUES (?, ?, ?, ?, ?, ? , ?);
 
 deleteNote:
 DELETE FROM noteEntity WHERE id = ?;
 
 updateNote:
-UPDATE noteEntity SET title = ?, content = ?, colorHex = ? WHERE id = ?;
+UPDATE noteEntity SET title = ?, content = ?, colorHex = ? , start = ? , end = ? WHERE id = ?;

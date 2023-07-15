@@ -8,7 +8,9 @@ data class Note(
     val title: String,
     val content: String,
     val colorHex: Long,
-    val created: LocalDateTime
+    val created: LocalDateTime,
+    val start: LocalDateTime,
+    val end : LocalDateTime
 ){
     companion object {
         val colors = listOf(   COLOR_BLUE,

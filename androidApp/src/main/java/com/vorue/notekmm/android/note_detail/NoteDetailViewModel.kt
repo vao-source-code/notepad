@@ -91,7 +91,10 @@ class NoteDetailViewModel @Inject constructor(
                     title = noteTitle.value,
                     content = noteContent.value,
                     colorHex = noteColor.value,
-                    created = DateTimeUtil.now()
+                    created = DateTimeUtil.now(),
+                    //TODO modificar esto urgente
+                    start = DateTimeUtil.now(),
+                    end = DateTimeUtil.now()
                 )
             )
             _hasNoteBeenSaved.value = true
