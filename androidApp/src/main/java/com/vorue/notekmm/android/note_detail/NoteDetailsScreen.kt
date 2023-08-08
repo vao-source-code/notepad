@@ -1,10 +1,14 @@
 package com.vorue.notekmm.android.note_detail
 
+import android.util.Log
+import android.widget.DatePicker
+import android.widget.TimePicker
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -17,6 +21,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,11 +29,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.vorue.notekmm.android.note_list.HideableSearchTextField
-import com.vorue.notekmm.android.note_list.NoteItem
-import com.vorue.notekmm.domain.Note
+import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
+import com.maxkeppeler.sheets.date_time.DateTimeDialog
+import com.maxkeppeler.sheets.date_time.models.DateTimeSelection
+import com.vorue.notekmm.library.DateTimeUtil
+
+
 import com.vorue.notekmm.presentation.COLOR_BLUE
 import com.vorue.notekmm.presentation.COLOR_GREEN
 import com.vorue.notekmm.presentation.COLOR_ORANGE
@@ -47,6 +56,8 @@ fun NoteDetailsScreen(
     val state by viewModel.state.collectAsState()
     val hasNoteBeenSaved by viewModel.hasNoteBeenSaved.collectAsState()
 
+    state.noteDateEnd
+    state.noteDateInit
     LaunchedEffect(key1 = hasNoteBeenSaved) {
         if (hasNoteBeenSaved)
             navController.popBackStack()
@@ -114,13 +125,45 @@ fun NoteDetailsScreenBody(state: NoteDetailState, modifier: Modifier, paddingVal
         )
 
 
-        Row() {
-            LazyVerticalColorButton(modifier, viewModel)
+        state.noteDateEnd
+        state.noteDateInit
+
+        LazyVerticalColorButton(modifier, viewModel)
+
+        Row(modifier= Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceBetween) {
+
+            ComposeDateTimePicker(viewModel = viewModel)
+
         }
 
     }
 
 }
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun ComposeDateTimePicker(  viewModel: NoteDetailViewModel ) {
+
+    Column {
+        val calendarState = rememberUseCaseState()
+
+
+        DateTimeDialog(state = calendarState, selection = DateTimeSelection.DateTime{
+            Log.d("TAG", "ComposeDateTimePicker: $it")
+            viewModel.onNoteDateInitChanged(it)
+        })
+
+        Text(text = "Date: ${DateTimeUtil.formatDate(viewModel.state.value.noteDateInit)}")
+
+        Button( onClick = { calendarState.show() }) {
+            Text(text = "Select Date")
+        }
+    }
+
+
+}
+
+
 
 @Preview
 @Composable
@@ -149,7 +192,10 @@ fun PreviewNoteDetailsScreenDark() {
     LazyVerticalGrid(modifier = Modifier.width(210.dp), columns = GridCells.Fixed(7) , content = {
         items(listColor) { it ->
             val i = listColor.indexOf(it)
-            Button(modifier = Modifier.height(40.dp).width(30.dp).padding(5.dp), onClick = {  } , colors = ButtonDefaults.buttonColors(backgroundColor = Color(it)) ) {
+            Button(modifier = Modifier
+                .height(40.dp)
+                .width(30.dp)
+                .padding(5.dp), onClick = {  } , colors = ButtonDefaults.buttonColors(backgroundColor = Color(it)) ) {
                // Text(text = Note.nameColor(i))
             }
         }

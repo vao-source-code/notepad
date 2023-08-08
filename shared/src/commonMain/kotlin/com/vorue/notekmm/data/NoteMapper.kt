@@ -13,7 +13,7 @@ fun NoteEntity.toNote() = Note(
     content = content,
     colorHex = colorHex,
     created = Instant.fromEpochMilliseconds(created).toLocalDateTime(TimeZone.currentSystemDefault()),
-    start = Instant.fromEpochMilliseconds(end).toLocalDateTime(TimeZone.currentSystemDefault()),
+    start = Instant.fromEpochMilliseconds(start).toLocalDateTime(TimeZone.currentSystemDefault()),
     end = Instant.fromEpochMilliseconds(end).toLocalDateTime(TimeZone.currentSystemDefault())
 
 )

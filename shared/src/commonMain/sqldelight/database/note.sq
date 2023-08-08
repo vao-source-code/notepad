@@ -4,7 +4,7 @@ CREATE TABLE noteEntity(
     content TEXT NOT NULL,
     colorHex INTEGER NOT NULL,
     created INTEGER NOT NULL,
-    start INTEGER ,
+    start INTEGER NOT NULL,
     end INTEGER NOT NULL
 );
 

@@ -1,5 +1,6 @@
 package com.vorue.notekmm.android.note_detail
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,8 +9,12 @@ import com.vorue.notekmm.domain.NoteDataSource
 import com.vorue.notekmm.library.DateTimeUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+
 import kotlinx.coroutines.launch
+import kotlinx.datetime.toKotlinLocalDateTime
+import java.time.LocalDateTime
 import javax.inject.Inject
+import kotlin.experimental.ExperimentalTypeInference
 
 @HiltViewModel
 class NoteDetailViewModel @Inject constructor(
@@ -25,22 +30,33 @@ class NoteDetailViewModel @Inject constructor(
         "noteColor",
         Note.generateRandomColor()
     )
+    private val noteDateInit = savedStateHandle.getStateFlow(
+        "noteDateInit",
+
+        DateTimeUtil.toEpochMilli(DateTimeUtil.now())
+    )
+    private val noteDateEnd = savedStateHandle.getStateFlow(
+        "noteDateEnd",
+        DateTimeUtil.toEpochMilli(DateTimeUtil.now())
+    )
 
     val state = combine(
         noteTitle,
-        isNoteTitleFocused,
         noteContent,
-        isNoteContentFocused,
-        noteColor
-    ) { title, isTitleFocused, content, isContentFocused, color ->
+        noteDateInit,
+        noteDateEnd,
+        noteColor)
+    { title, content, init, end , col ->
         NoteDetailState(
             noteTitle = title,
-            isNoteTitleHintVisible = title.isEmpty() && !isTitleFocused,
+            isNoteTitleHintVisible = title.isEmpty() && !isNoteTitleFocused.value,
             noteContent = content,
-            isNoteContentHintVisible = content.isEmpty() && !isContentFocused,
-            noteColor = color
+            isNoteContentHintVisible = content.isEmpty() && !isNoteContentFocused.value,
+            noteColor = col,
+            noteDateInit = init,
+            noteDateEnd = end,
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), NoteDetailState())
+    }    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), NoteDetailState())
 
     private val _hasNoteBeenSaved = MutableStateFlow(false)
     val hasNoteBeenSaved = _hasNoteBeenSaved.asStateFlow()
@@ -58,6 +74,8 @@ class NoteDetailViewModel @Inject constructor(
                     savedStateHandle["noteTitle"] = note.title
                     savedStateHandle["noteContent"] = note.content
                     savedStateHandle["noteColor"] = note.colorHex
+                    savedStateHandle["noteDateInit"] = DateTimeUtil.toEpochMilli(note.start)
+                    savedStateHandle["noteDateEnd"] = DateTimeUtil.toEpochMilli(note.end)
                 }
             }
         }
@@ -83,6 +101,26 @@ class NoteDetailViewModel @Inject constructor(
         savedStateHandle["isNoteContentFocused"] = isFocused
     }
 
+    fun onNoteDateInitChanged(date: Long) {
+        savedStateHandle["noteDateInit"] = date
+    }
+
+    fun onNoteDateInitChanged(date: LocalDateTime) {
+        savedStateHandle["noteDateInit"] = DateTimeUtil.toEpochMilli(date.toKotlinLocalDateTime())
+
+        Log.d("TAG", noteDateInit.value.toString())
+    }
+
+
+    fun onNoteDateEndChanged(date: LocalDateTime) {
+        savedStateHandle["noteDateEnd"] = DateTimeUtil.toEpochMilli(date.toKotlinLocalDateTime())
+    }
+    fun onNoteDateEndChanged(date: Long) {
+        savedStateHandle["noteDateEnd"] = date
+    }
+
+
+
     fun saveNote() {
         viewModelScope.launch {
             noteDataSource.insertNote(
@@ -93,11 +131,15 @@ class NoteDetailViewModel @Inject constructor(
                     colorHex = noteColor.value,
                     created = DateTimeUtil.now(),
                     //TODO modificar esto urgente
-                    start = DateTimeUtil.now(),
-                    end = DateTimeUtil.now()
+                    start  = DateTimeUtil.toLocalDateTime(noteDateInit.value),
+                    end = DateTimeUtil.toLocalDateTime(noteDateEnd.value)
                 )
             )
             _hasNoteBeenSaved.value = true
         }
     }
+
+
+
+
 }

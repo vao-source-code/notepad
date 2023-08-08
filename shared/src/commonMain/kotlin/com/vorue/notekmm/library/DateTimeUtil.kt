@@ -14,6 +14,8 @@ object DateTimeUtil {
         return localDateTime.toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
     }
 
+
+
     fun formatSample(localDateTime: LocalDateTime): String {
         return localDateTime.toString().replace("T", " ")
     }
@@ -29,5 +31,14 @@ object DateTimeUtil {
         return buildString {
             append("$day $month $year , $hour:$minute")
         }
+    }
+
+    fun formatDate(localDateTime: Long): String {
+        return formatDate(toLocalDateTime(localDateTime))
+    }
+
+
+    fun toLocalDateTime(value: Long): LocalDateTime {
+        return Instant.fromEpochMilliseconds(value).toLocalDateTime(TimeZone.currentSystemDefault())
     }
 }
